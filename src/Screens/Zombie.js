@@ -23,9 +23,23 @@ const Zombie = (props) => {
 	const [zombie, setZombie] = useState([]);
 	const [zombieOwner, setZombieOwner] = useState('');
 	const [toName, setToName] = useState('');
+	const [fromZombieId, setFromZombieId] = useState('');
 	const [loading, setLoading] = useState(false);
+	const account = window.localStorage.getItem('account');
 
-	const handleChange = ({target: {value}}) => setToName(value);
+	const handleAttackSubmit = async (event) => {
+		event.preventDefault();
+		setLoading(true);
+		await contract.attack(
+			fromZombieId,
+			id,
+			(receipt) => console.log('Successfully', receipt),
+			(error) => console.log('Failure', error),
+		);
+	};
+	const handleToNameChange = ({target: {value}}) => setToName(value);
+	const handleFromZombieIdChange = ({target: {value}}) =>
+		setFromZombieId(value);
 	const handleTransferSubmit = async (event) => {
 		event.preventDefault();
 		setLoading(true);
@@ -48,6 +62,7 @@ const Zombie = (props) => {
 		<Content>
 			<Title>Zombie: {zombie.name}</Title>
 			<ul>
+				<li>id: {id}</li>
 				<li>name: {zombie.name}</li>
 				<li>level: {zombie.level}</li>
 				<li>dna: {zombie.dna}</li>
@@ -62,15 +77,25 @@ const Zombie = (props) => {
 			<br />
 			{loading ? (
 				<Loader text='Processing...' />
-			) : (
+			) : zombieOwner === account ? (
 				<form onSubmit={handleTransferSubmit}>
 					<input
 						type='text'
 						name='toName'
 						placeholder='to'
-						onChange={handleChange}
+						onChange={handleToNameChange}
 					/>
-					<button>Transfer</button>
+					<button>Transfer</button> (ERC721)
+				</form>
+			) : (
+				<form onSubmit={handleAttackSubmit}>
+					<input
+						type='text'
+						name='fromZombieId'
+						placeholder='from My ZombieId'
+						onChange={handleFromZombieIdChange}
+					/>
+					<button>Attack</button>
 				</form>
 			)}
 		</Content>

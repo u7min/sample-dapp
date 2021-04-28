@@ -47,4 +47,24 @@ export const zombieContract = {
 			.on('receipt', callback)
 			.on('error', error);
 	},
+	getAccount: async () => {
+		const accounts = await web3.eth.getAccounts();
+		return accounts[0];
+	},
+	attack: async (fromZombieId, toZombieId, callback, error) => {
+		const accounts = await web3.eth.getAccounts();
+		console.log(fromZombieId, toZombieId, accounts[0]);
+		return contract.methods
+			.attack(fromZombieId, toZombieId)
+			.send({from: accounts[0]})
+			.on('receipt', callback)
+			.on('error', error);
+	},
+	transferEvent: async (callback, error) => {
+		const accounts = await web3.eth.getAccounts();
+		contract.events
+			.Transfer({filter: {_to: accounts[0]}})
+			.on('data', callback)
+			.on('error', error);
+	},
 };

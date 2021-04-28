@@ -8,19 +8,31 @@ const Header = styled.header`
 `;
 const MessageBox = styled.div`
 	width: 90%;
-	height: 30px;
-	background-color: aquamarine;
-	border: 1px solid cadetblue;
+	background-color: khaki;
+	border: 0px;
 	margin-top: 10px;
+	padding: 10px 0px 7px 10px;
 `;
 
 export default () => {
-	const [message, setMessage] = useState('');
+	const [message, setMessage] = useState();
+	useEffect(() => {
+		zombieContract
+			.getAccount()
+			.then((account) => window.localStorage.setItem('account', account));
+		zombieContract.transferEvent(
+			(event) =>
+				setMessage(
+					`Received '${event.returnValues['_tokenId']}' Zombies.`,
+				),
+			(error) => console.error(error),
+		);
+	}, []);
 	return (
 		<Header>
 			<Link to={`/zombies`}>My</Link>&nbsp;
 			<Link to={`/create-zombie`}>Create Zombie</Link>
-			{message ? <MessageBox>Message</MessageBox> : <></>}
+			{message ? <MessageBox>{message}</MessageBox> : <></>}
 		</Header>
 	);
 };
